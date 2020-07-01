@@ -45,126 +45,106 @@ void test_eval() {
     slassert(nullptr != ctx);
 
     auto hello = std::string("Hello world!");
-    auto code = std::string("let a = \"" + hello +"\"; a");
+    //auto code = std::string("let a = \"" + hello +"\"; a");
+    auto code = std::string("\"Hello\" + \" \" + \"world!\"");
     auto val = JS_Eval(ctx, code.c_str(), code.length(), "hello.js", 0);
     slassert(JS_IsString(val) > 0);
     auto res = JS_ToCString(ctx, val);
     slassert(nullptr != res);
     auto res_str = std::string(res);
     slassert(hello == res_str);
+
+    JS_FreeCString(ctx, res);
     JS_FreeValue(ctx, val);
 
     JS_FreeContext(ctx);
     JS_FreeRuntime(rt);
 }
 
-/*
-void test_dump_load() {
-    duk_context* ctx = duk_create_heap_default();
-    slassert(nullptr != ctx);
-    slassert(0 == duk_get_top(ctx));
-    duk_push_string(ctx, "var myfun = function() { print('Hello world!'); return 42; }");
-    duk_push_string(ctx, "test/hello.js");
-    slassert(2 == duk_get_top(ctx));
-    slassert(0 == duk_pcompile(ctx, DUK_COMPILE_EVAL));
-    slassert(1 == duk_get_top(ctx));
-    duk_dump_function(ctx);
-    slassert(1 == duk_get_top(ctx));
-    size_t sz;
-    auto buf_ptr = duk_get_buffer(ctx, -1, std::addressof(sz));
-    slassert(nullptr != buf_ptr);
-    std::vector<unsigned char> vec;
-    vec.resize(sz);
-    std::memcpy(vec.data(), buf_ptr, sz);
-    
-    duk_pop(ctx);
-    slassert(0 == duk_get_top(ctx));
-    
-    duk_push_fixed_buffer(ctx, vec.size());
-    slassert(1 == duk_get_top(ctx));
-    size_t load_size;
-    auto load_ptr = duk_get_buffer(ctx, -1, std::addressof(load_size));
-    slassert(nullptr != load_ptr);
-    slassert(load_size == vec.size());
-    std::memcpy(load_ptr, vec.data(), vec.size());
-    
-    duk_load_function(ctx);
-    slassert(1 == duk_get_top(ctx));
-    printf("load result type: %d\n", (int) duk_get_type(ctx, -1));
-    slassert(0 == duk_pcall(ctx, 0));
-    slassert(1 == duk_get_top(ctx));
-    duk_pop(ctx);
-    slassert(0 == duk_get_top(ctx));
-    
-    duk_push_string(ctx, "myfun()");
-    slassert(0 == duk_peval(ctx));
-    slassert(42 == static_cast<int> (duk_get_number(ctx, -1)));
-        
-    duk_pop(ctx);
-    slassert(0 == duk_get_top(ctx));
-    duk_destroy_heap(ctx);
-}
-
 void test_errors() {
-    duk_context* ctx = duk_create_heap(nullptr, nullptr, nullptr, nullptr, 
-            [] (duk_context*, duk_errcode_t code, const char* msg) {
-        std::string err = std::string("Duktape error, code: [") + sl::support::to_string(code) + 
-                "], message: [" + msg + "]";
-        throw std::runtime_error(err);
-    });
-    slassert(nullptr != ctx);
-    slassert(0 == duk_get_top(ctx));
+    auto rt = JS_NewRuntime();
+    auto ctx = JS_NewContext(rt);
 
-    duk_push_string(ctx, "AAAAAA");
-    duk_push_string(ctx, "test/fail.js");
-    slassert(2 == duk_get_top(ctx));
-//    duk_compile(ctx, DUK_COMPILE_FUNCTION);
-    slassert(0 != duk_pcompile(ctx, DUK_COMPILE_FUNCTION));
+    auto code = std::string("AAAAAA");
+    auto ret_val = JS_Eval(ctx, code.c_str(), code.length(), "text/fail.js", 0);
+    slassert(JS_IsException(ret_val) > 0);
+    auto exc_val = JS_GetException(ctx);
+    slassert(JS_IsObject(exc_val) > 0);
+    auto msg_val = JS_GetPropertyStr(ctx, exc_val, "message");
+    slassert(JS_IsString(msg_val) > 0);
+    auto msg = JS_ToCString(ctx, msg_val);
+    //std::cout << "[" << msg << "]" << std::endl;
+    auto stack_val = JS_GetPropertyStr(ctx, exc_val, "stack");
+    slassert(JS_IsString(stack_val) > 0);
+    auto stack = JS_ToCString(ctx, stack_val);
+    //std::cout << "[" << stack << "]" << std::endl;
 
-    duk_pop(ctx);
-    slassert(0 == duk_get_top(ctx));
-    duk_destroy_heap(ctx);
+    JS_FreeValue(ctx, ret_val);
+    JS_FreeValue(ctx, exc_val);
+    JS_FreeCString(ctx, msg);
+    JS_FreeValue(ctx, msg_val);
+    JS_FreeCString(ctx, stack);
+    JS_FreeValue(ctx, stack_val);
+
+    JS_FreeContext(ctx);
+    JS_FreeRuntime(rt);
 }
 
-duk_ret_t my_native_func(duk_context* ctx) {
-    size_t len;
-    const char* input = duk_get_lstring(ctx, 0, std::addressof(len));
+static JSValue my_native_func(JSContext *ctx, JSValueConst this_val,
+        int argc, JSValueConst *argv) {
+    (void) this_val;
+    (void) argc;
+    auto input = JS_ToCString(ctx, argv[0]);
     std::cout << "my_native_func called" << std::endl;
-    std::cout << len << std::endl;
+    std::cout << argc << std::endl;
     std::cout << std::string(input) << std::endl;
-    duk_push_string(ctx, "my func returned");
-    return 1;
+    JS_FreeCString(ctx, input);
+    auto res = JS_NewString(ctx, "foo");
+    return res;
 }
-*/
 
-//void test_call_native() {
-//    duk_context* ctx = duk_create_heap_default();
-//    slassert(nullptr != ctx);
-//    slassert(0 == duk_get_top(ctx));
-//    duk_push_global_object(ctx);
-//    slassert(1 == duk_get_top(ctx));
-//    duk_push_c_function(ctx, my_native_func, 1 /*nargs*/);
-//    slassert(2 == duk_get_top(ctx));
-//    duk_put_prop_string(ctx, -2, "my_native_func");
-//    slassert(1 == duk_get_top(ctx));
-//    duk_pop(ctx);
-//    slassert(0 == duk_get_top(ctx));
-//
-//    slassert(0 == duk_peval_string(ctx, "my_native_func('foo bar baz');"));
-//    slassert(1 == duk_get_top(ctx));
-//    slassert("my func returned" == std::string(duk_get_string(ctx, -1)));
-//
-//    duk_pop(ctx);
-//    slassert(0 == duk_get_top(ctx));
-//    duk_destroy_heap(ctx);
-//}
+void test_call_native() {
+    auto rt = JS_NewRuntime();
+    auto ctx = JS_NewContext(rt);
+
+    auto fun = JS_NewCFunction(ctx, my_native_func, "myfun", 1);
+    slassert(JS_IsObject(fun) > 0);
+    slassert(JS_IsFunction(ctx, fun) > 0);
+    auto obj = JS_GetGlobalObject(ctx);
+    slassert(JS_IsObject(obj) > 0);
+    auto res_code = JS_SetPropertyStr(ctx, obj, "myfun", fun);
+    slassert(res_code > 0);
+
+    auto code = std::string("myfun(\"Hello!\")");
+    auto ret_val = JS_Eval(ctx, code.c_str(), code.length(), "fun.js", 0);
+
+    if (JS_IsException(ret_val) > 0) {
+        auto exc_val = JS_GetException(ctx);
+        auto msg = JS_ToCString(ctx, exc_val);
+        std::cout << "[" << msg << "]" << std::endl;
+        JS_FreeCString(ctx, msg);
+        JS_FreeValue(ctx, exc_val);
+    }
+
+    slassert(JS_IsString(ret_val) > 0);
+    auto ret = JS_ToCString(ctx, ret_val);
+    auto ret_str = std::string(ret);
+    slassert(ret_str == "foo");
+
+    JS_FreeCString(ctx, ret);
+    JS_FreeValue(ctx, ret_val);
+    //JS_FreeValue(ctx, fun);
+    JS_FreeValue(ctx, obj);
+
+    JS_FreeContext(ctx);
+    JS_FreeRuntime(rt);
+}
 
 int main() {
     try {
         test_eval();
-        //test_dump_load();
-        //test_errors();
-        //test_call_native();
+        test_errors();
+        test_call_native();
     } catch (const std::exception& e) {
         std::cout << e.what() << std::endl;
         return 1;
