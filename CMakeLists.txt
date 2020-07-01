@@ -26,12 +26,12 @@ if ( NOT DEFINED CMAKE_LIBRARY_OUTPUT_DIRECTORY )
 endif ( )
 
 # library
-add_subdirectory ( ${CMAKE_CURRENT_LIST_DIR}/resources/quickjs_20200412_cmake ${CMAKE_CURRENT_BINARY_DIR}/quickjs)
+add_subdirectory ( ${CMAKE_CURRENT_LIST_DIR}/resources/quickjs_cmake ${CMAKE_CURRENT_BINARY_DIR}/quickjs)
 add_custom_target ( ${PROJECT_NAME} DEPENDS quickjs )
 
 # pkg-config
 set ( ${PROJECT_NAME}_MODULE quickjs )
-set ( ${PROJECT_NAME}_PC_CFLAGS "-I${CMAKE_CURRENT_LIST_DIR}/../quickjs" )
+set ( ${PROJECT_NAME}_PC_CFLAGS "-I${CMAKE_CURRENT_LIST_DIR}/quickjs" )
 set ( ${PROJECT_NAME}_PC_LIBS "-L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} -lquickjs" )
 if ( ${PROJECT_NAME}_TOOLCHAIN MATCHES "linux_[^_]+_[^_]+" )
     set ( ${PROJECT_NAME}_PC_LIBS "${${PROJECT_NAME}_PC_LIBS} -lm" )

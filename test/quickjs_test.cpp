@@ -43,21 +43,19 @@ void test_eval() {
     slassert(nullptr != rt);
     auto ctx = JS_NewContext(rt);
     slassert(nullptr != ctx);
+
+    auto hello = std::string("Hello world!");
+    auto code = std::string("let a = \"" + hello +"\"; a");
+    auto val = JS_Eval(ctx, code.c_str(), code.length(), "hello.js", 0);
+    slassert(JS_IsString(val) > 0);
+    auto res = JS_ToCString(ctx, val);
+    slassert(nullptr != res);
+    auto res_str = std::string(res);
+    slassert(hello == res_str);
+    JS_FreeValue(ctx, val);
+
     JS_FreeContext(ctx);
     JS_FreeRuntime(rt);
-    /*
-    duk_context* ctx = duk_create_heap_default();
-    slassert(nullptr != ctx);
-    slassert(0 == duk_get_top(ctx));
-    duk_push_string(ctx, "print('Hello world!'); 42;");
-    slassert(1 == duk_get_top(ctx));
-    slassert(0 == duk_peval(ctx));
-    slassert(1 == duk_get_top(ctx));
-    slassert(42 == static_cast<int> (duk_get_number(ctx, -1)));
-    duk_pop(ctx);
-    slassert(0 == duk_get_top(ctx));
-    duk_destroy_heap(ctx);
-    */
 }
 
 /*
