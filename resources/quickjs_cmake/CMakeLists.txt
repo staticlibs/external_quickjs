@@ -37,10 +37,10 @@ target_compile_definitions ( ${PROJECT_NAME} PRIVATE
         -D_GNU_SOURCE
         -DCONFIG_VERSION=\"2020-04-12\" )
 
-if ( ${CMAKE_C_COMPILER_ID} MATCHES "GNU" OR ${CMAKE_C_COMPILER_ID} MATCHES "Clang" )
-    target_compile_options ( ${PROJECT_NAME} PRIVATE
-            -Wno-unused-parameter )
-endif ( )
+#if ( ${CMAKE_C_COMPILER_ID} MATCHES "GNU" OR ${CMAKE_C_COMPILER_ID} MATCHES "Clang" )
+#    target_compile_options ( ${PROJECT_NAME} PRIVATE
+#            -Wno-unused-parameter )
+#endif ( )
 #if ( ${CMAKE_C_COMPILER_ID} MATCHES "GNU" )
 #    target_compile_options ( ${PROJECT_NAME} PRIVATE
 #            -Wno-ignored-qualifiers )
@@ -48,8 +48,4 @@ endif ( )
 #if ( ${CMAKE_C_COMPILER_ID} MATCHES "Clang" )
 #    target_compile_options ( ${PROJECT_NAME} PRIVATE
 #            -Wno-deprecated )
-#endif ( )
-#if ( ${CMAKE_C_COMPILER_ID}x MATCHES "MSVCx" )
-#    target_compile_options ( ${PROJECT_NAME} PRIVATE
-#            /wd4100 /wd4127 /wd4551 /wd4505 /wd4701 /wd4702 )
 #endif ( )

@@ -1526,7 +1526,15 @@ static inline uint8_t *js_get_stack_pointer(void)
 static inline BOOL js_check_stack_overflow(JSRuntime *rt, size_t alloca_size)
 {
     size_t size;
-    size = rt->stack_top - js_get_stack_pointer();
+    // wilton patch: prevent bogus overflow
+    uintptr_t top, sp;
+    top = (uintptr_t) rt->stack_top;
+    sp = (uintptr_t) js_get_stack_pointer();
+    if (top > sp) {
+        size = top - sp;
+    } else {
+        size = 0;
+    }
     return unlikely((size + alloca_size) > rt->stack_size);
 }
 #endif
@@ -7570,35 +7578,59 @@ static JSValue JS_GetPropertyValue(JSContext *ctx, JSValueConst this_obj,
         /* fast path for array access */
         p = JS_VALUE_GET_OBJ(this_obj);
         idx = JS_VALUE_GET_INT(prop);
-        len = (uint32_t)p->u.array.count;
-        if (unlikely(idx >= len))
-            goto slow_path;
+        // wilton patch
+        // https://www.freelists.org/post/quickjs-devel/patch-Uninitialised-memory-access-in-JS-GetPropertyValue,1
+        //len = (uint32_t)p->u.array.count;
+        //if (unlikely(idx >= len))
+        //    goto slow_path;
         switch(p->class_id) {
         case JS_CLASS_ARRAY:
         case JS_CLASS_ARGUMENTS:
+            len = (uint32_t)p->u.array.count;
+            if (unlikely(idx >= len)) goto slow_path;
             return JS_DupValue(ctx, p->u.array.u.values[idx]);
         case JS_CLASS_INT8_ARRAY:
+            len = (uint32_t)p->u.array.count;
+            if (unlikely(idx >= len)) goto slow_path;
             return JS_NewInt32(ctx, p->u.array.u.int8_ptr[idx]);
         case JS_CLASS_UINT8C_ARRAY:
         case JS_CLASS_UINT8_ARRAY:
+            len = (uint32_t)p->u.array.count;
+            if (unlikely(idx >= len)) goto slow_path;
             return JS_NewInt32(ctx, p->u.array.u.uint8_ptr[idx]);
         case JS_CLASS_INT16_ARRAY:
+            len = (uint32_t)p->u.array.count;
+            if (unlikely(idx >= len)) goto slow_path;
             return JS_NewInt32(ctx, p->u.array.u.int16_ptr[idx]);
         case JS_CLASS_UINT16_ARRAY:
+            len = (uint32_t)p->u.array.count;
+            if (unlikely(idx >= len)) goto slow_path;
             return JS_NewInt32(ctx, p->u.array.u.uint16_ptr[idx]);
         case JS_CLASS_INT32_ARRAY:
+            len = (uint32_t)p->u.array.count;
+            if (unlikely(idx >= len)) goto slow_path;
             return JS_NewInt32(ctx, p->u.array.u.int32_ptr[idx]);
         case JS_CLASS_UINT32_ARRAY:
+            len = (uint32_t)p->u.array.count;
+            if (unlikely(idx >= len)) goto slow_path;
             return JS_NewUint32(ctx, p->u.array.u.uint32_ptr[idx]);
 #ifdef CONFIG_BIGNUM
         case JS_CLASS_BIG_INT64_ARRAY:
+            len = (uint32_t)p->u.array.count;
+            if (unlikely(idx >= len)) goto slow_path;
             return JS_NewBigInt64(ctx, p->u.array.u.int64_ptr[idx]);
         case JS_CLASS_BIG_UINT64_ARRAY:
+            len = (uint32_t)p->u.array.count;
+            if (unlikely(idx >= len)) goto slow_path;
             return JS_NewBigUint64(ctx, p->u.array.u.uint64_ptr[idx]);
 #endif
         case JS_CLASS_FLOAT32_ARRAY:
+            len = (uint32_t)p->u.array.count;
+            if (unlikely(idx >= len)) goto slow_path;
             return __JS_NewFloat64(ctx, p->u.array.u.float_ptr[idx]);
         case JS_CLASS_FLOAT64_ARRAY:
+            len = (uint32_t)p->u.array.count;
+            if (unlikely(idx >= len)) goto slow_path;
             return __JS_NewFloat64(ctx, p->u.array.u.double_ptr[idx]);
         default:
             goto slow_path;
