@@ -13,7 +13,7 @@
 # limitations under the License.
 
 cmake_minimum_required ( VERSION 2.8.12 )
-project ( quickjs C )
+project ( quickjs C CXX )
 set ( ${PROJECT_NAME}_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/../../quickjs )
 
 # check deplibs cache
@@ -27,15 +27,20 @@ if ( STATICLIB_USE_DEPLIBS_CACHE )
     endif ( )
 endif ( )
 
-add_library ( ${PROJECT_NAME} STATIC
-        ${${PROJECT_NAME}_SOURCE_DIR}/quickjs.c
-        ${${PROJECT_NAME}_SOURCE_DIR}/libunicode.c
-        ${${PROJECT_NAME}_SOURCE_DIR}/libregexp.c
-        ${${PROJECT_NAME}_SOURCE_DIR}/cutils.c )
-target_include_directories ( ${PROJECT_NAME} BEFORE PRIVATE ${${PROJECT_NAME}_SOURCE_DIR} )
-target_compile_definitions ( ${PROJECT_NAME} PRIVATE
-        -D_GNU_SOURCE
-        -DCONFIG_VERSION=\"2020-04-12\" )
+if ( ${CMAKE_C_COMPILER_ID}x MATCHES "MSVCx" )
+    add_library ( ${PROJECT_NAME} STATIC
+            ${CMAKE_CURRENT_LIST_DIR}/../../msvc/quickjs-shim.cpp )
+else ()
+    add_library ( ${PROJECT_NAME} STATIC
+            ${${PROJECT_NAME}_SOURCE_DIR}/quickjs.c
+            ${${PROJECT_NAME}_SOURCE_DIR}/libunicode.c
+            ${${PROJECT_NAME}_SOURCE_DIR}/libregexp.c
+            ${${PROJECT_NAME}_SOURCE_DIR}/cutils.c )
+    target_include_directories ( ${PROJECT_NAME} BEFORE PRIVATE ${${PROJECT_NAME}_SOURCE_DIR} )
+    target_compile_definitions ( ${PROJECT_NAME} PRIVATE
+            -D_GNU_SOURCE
+            -DCONFIG_VERSION=\"2020-04-12\" )
+endif ()
 
 #if ( ${CMAKE_C_COMPILER_ID} MATCHES "GNU" OR ${CMAKE_C_COMPILER_ID} MATCHES "Clang" )
 #    target_compile_options ( ${PROJECT_NAME} PRIVATE
