@@ -158,6 +158,7 @@ static inline double JS_VALUE_GET_FLOAT64(JSValue v)
 
 static inline JSValue __JS_NewFloat64(JSContext *ctx, double d)
 {
+    (void) ctx;
     union {
         double d;
         uint64_t u64;

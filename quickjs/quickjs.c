@@ -1624,6 +1624,8 @@ static inline size_t js_def_malloc_usable_size(void *ptr)
     return _msize(ptr);
 #elif defined(EMSCRIPTEN)
     return 0;
+#elif defined(ANDROID)
+    return 0;
 #elif defined(__linux__)
     return malloc_usable_size(ptr);
 #else
@@ -1697,6 +1699,8 @@ static const JSMallocFunctions def_malloc_funcs = {
 #elif defined(_WIN32)
     (size_t (*)(const void *))_msize,
 #elif defined(EMSCRIPTEN)
+    NULL,
+#elif defined(ANDROID)
     NULL,
 #elif defined(__linux__)
     (size_t (*)(const void *))malloc_usable_size,
@@ -40513,6 +40517,12 @@ static JSValue js_math_random(JSContext *ctx, JSValueConst this_val,
     u.u64 = ((uint64_t)0x3ff << 52) | (v >> 12);
     return __JS_NewFloat64(ctx, u.d - 1.0);
 }
+
+#ifdef ANDROID
+double log2(double val) {
+    return log(val)/log(2);
+}
+#endif // ANDROID
 
 static const JSCFunctionListEntry js_math_funcs[] = {
     JS_CFUNC_MAGIC_DEF("min", 2, js_math_min_max, 0 ),
