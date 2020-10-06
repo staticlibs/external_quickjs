@@ -52,6 +52,7 @@ JSValue JS_NewError(JSContext *ctx);
 JSValue JS_Call(JSContext *ctx, JSValueConst func_obj, JSValueConst this_obj, int argc, JSValueConst *argv);
 void JS_RunGC(JSRuntime *rt);
 
+int JS_WiltonInitialize();
 JSValue JS_WiltonUndefined();
 JSValue JS_WiltonNull();
 

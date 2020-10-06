@@ -28,8 +28,35 @@ if ( STATICLIB_USE_DEPLIBS_CACHE )
 endif ( )
 
 if ( ${CMAKE_C_COMPILER_ID}x MATCHES "MSVCx" )
+    
     add_library ( ${PROJECT_NAME} STATIC
-            ${CMAKE_CURRENT_LIST_DIR}/../../msvc/quickjs-shim.cpp )
+                ${CMAKE_CURRENT_LIST_DIR}/../../msvc/quickjs-shim.cpp )
+
+    add_custom_target ( ${PROJECT_NAME}_mingw
+            COMMAND $ENV{MINGW_HOME}/bin/gcc.exe
+                    -c
+                    -D_GNU_SOURCE
+                    -DCONFIG_VERSION="\\"2020-04-12\\""
+                    -g
+                    -O0
+                    ${${PROJECT_NAME}_SOURCE_DIR}/quickjs.c
+                    ${${PROJECT_NAME}_SOURCE_DIR}/libunicode.c
+                    ${${PROJECT_NAME}_SOURCE_DIR}/libregexp.c
+                    ${${PROJECT_NAME}_SOURCE_DIR}/cutils.c
+                    ${${PROJECT_NAME}_SOURCE_DIR}/quickjs-wilton.c
+            COMMAND $ENV{MINGW_HOME}/bin/gcc.exe
+                    -shared
+                    -o ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/quickjs.dll
+                    -Wl,--exclude-all-symbols
+                    quickjs.o
+                    libunicode.o
+                    libregexp.o
+                    cutils.o
+                    quickjs-wilton.o
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} )
+
+    add_dependencies ( ${PROJECT_NAME} ${PROJECT_NAME}_mingw )
+
 else ()
     add_library ( ${PROJECT_NAME} STATIC
             ${${PROJECT_NAME}_SOURCE_DIR}/quickjs.c

@@ -1007,15 +1007,11 @@ int JS_SetModuleExport(JSContext *ctx, JSModuleDef *m, const char *export_name,
 int JS_SetModuleExportList(JSContext *ctx, JSModuleDef *m,
                            const JSCFunctionListEntry *tab, int len);
 
-/* wilton */
-inline JSValue JS_WiltonUndefined() {
-    rerurn JS_UNDEFINED;
-}
-
-inline JSValue JS_WiltonNull() {
-    return JS_NULL;
-}
-/* end wilton */
+/* wilton symbols */
+int JS_WiltonInitialize();
+JSValue JS_WiltonUndefined();
+JSValue JS_WiltonNull();
+/* end wilton symbols */
                            
 #undef js_unlikely
 #undef js_force_inline

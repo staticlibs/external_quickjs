@@ -37,6 +37,10 @@ using namespace std;
 
 #include "staticlib/support.hpp"
 
+void test_init() {
+    auto err = JS_WiltonInitialize();
+    slassert(0 == err);
+}
 
 void test_eval() {
     auto rt = JS_NewRuntime();
@@ -49,7 +53,7 @@ void test_eval() {
     auto code = std::string("\"Hello\" + \" \" + \"world!\"");
     auto val = JS_Eval(ctx, code.c_str(), code.length(), "hello.js", 0);
     slassert(JS_IsString(val) > 0);
-    auto res = JS_ToCString(ctx, val);
+    auto res = JS_ToCStringLen(ctx, nullptr, val);
     slassert(nullptr != res);
     auto res_str = std::string(res);
     slassert(hello == res_str);
@@ -72,11 +76,11 @@ void test_errors() {
     slassert(JS_IsObject(exc_val) > 0);
     auto msg_val = JS_GetPropertyStr(ctx, exc_val, "message");
     slassert(JS_IsString(msg_val) > 0);
-    auto msg = JS_ToCString(ctx, msg_val);
+    auto msg = JS_ToCStringLen(ctx, nullptr, msg_val);
     //std::cout << "[" << msg << "]" << std::endl;
     auto stack_val = JS_GetPropertyStr(ctx, exc_val, "stack");
     slassert(JS_IsString(stack_val) > 0);
-    auto stack = JS_ToCString(ctx, stack_val);
+    auto stack = JS_ToCStringLen(ctx, nullptr, stack_val);
     //std::cout << "[" << stack << "]" << std::endl;
 
     JS_FreeValue(ctx, ret_val);
@@ -94,12 +98,12 @@ static JSValue my_native_func(JSContext *ctx, JSValueConst this_val,
         int argc, JSValueConst *argv) {
     (void) this_val;
     (void) argc;
-    auto input = JS_ToCString(ctx, argv[0]);
+    auto input = JS_ToCStringLen(ctx, nullptr, argv[0]);
     std::cout << "my_native_func called" << std::endl;
     std::cout << argc << std::endl;
     std::cout << std::string(input) << std::endl;
     JS_FreeCString(ctx, input);
-    auto res = JS_NewString(ctx, "foo");
+    auto res = JS_NewStringLen(ctx, "foo", 3);
     return res;
 }
 
@@ -120,14 +124,14 @@ void test_call_native() {
 
     if (JS_IsException(ret_val) > 0) {
         auto exc_val = JS_GetException(ctx);
-        auto msg = JS_ToCString(ctx, exc_val);
+        auto msg = JS_ToCStringLen(ctx, nullptr, exc_val);
         std::cout << "[" << msg << "]" << std::endl;
         JS_FreeCString(ctx, msg);
         JS_FreeValue(ctx, exc_val);
     }
 
     slassert(JS_IsString(ret_val) > 0);
-    auto ret = JS_ToCString(ctx, ret_val);
+    auto ret = JS_ToCStringLen(ctx, nullptr, ret_val);
     auto ret_str = std::string(ret);
     slassert(ret_str == "foo");
 
@@ -142,6 +146,7 @@ void test_call_native() {
 
 int main() {
     try {
+        test_init();
         test_eval();
         test_errors();
         test_call_native();
