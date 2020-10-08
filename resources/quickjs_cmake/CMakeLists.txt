@@ -79,6 +79,8 @@ if ( ${CMAKE_C_COMPILER_ID}x MATCHES "MSVCx" )
 
     add_library ( ${PROJECT_NAME} STATIC
                 ${${PROJECT_NAME}_SOURCE_DIR}/wilton-dyload.c )
+    target_compile_definitions ( ${PROJECT_NAME} PRIVATE
+            -Dinline=__inline )
 
     add_dependencies ( ${PROJECT_NAME} ${PROJECT_NAME}_mingw )
 

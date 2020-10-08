@@ -35,6 +35,7 @@
 
 void test_init() {
     auto err = JS_WiltonInitialize();
+    std::cout << err << std::endl;
     slassert(0 == err);
 }
 
