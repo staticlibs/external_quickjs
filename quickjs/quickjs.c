@@ -1526,7 +1526,7 @@ static inline uint8_t *js_get_stack_pointer(void)
 static inline BOOL js_check_stack_overflow(JSRuntime *rt, size_t alloca_size)
 {
     size_t size;
-    // wilton patch: prevent bogus overflow
+    // staticlib patch: prevent bogus overflow
     uintptr_t top, sp;
     top = (uintptr_t) rt->stack_top;
     sp = (uintptr_t) js_get_stack_pointer();
@@ -7582,7 +7582,7 @@ static JSValue JS_GetPropertyValue(JSContext *ctx, JSValueConst this_obj,
         /* fast path for array access */
         p = JS_VALUE_GET_OBJ(this_obj);
         idx = JS_VALUE_GET_INT(prop);
-        // wilton patch
+        // staticlib patch
         // https://www.freelists.org/post/quickjs-devel/patch-Uninitialised-memory-access-in-JS-GetPropertyValue,1
         //len = (uint32_t)p->u.array.count;
         //if (unlikely(idx >= len))

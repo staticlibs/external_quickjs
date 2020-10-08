@@ -15,12 +15,12 @@
  */
 
 /* 
- * File:   wilton-noop.c
+ * File:   staticlib-noop.c
  * Author: alex
  *
  * Created on October 8, 2020, 1:25 PM
  */
 
-int JS_WiltonInitialize() {
+int JS_StaticlibInitialize() {
     return 0;
 }

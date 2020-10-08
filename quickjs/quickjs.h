@@ -1018,9 +1018,9 @@ int JS_SetModuleExportList(JSContext *ctx, JSModuleDef *m,
 #undef js_unlikely
 #undef js_force_inline
 
-// wilton
-int JS_WiltonInitialize();
-// end wilton
+// staticlib
+int JS_StaticlibInitialize();
+// end staticlib
 
 #ifdef __cplusplus
 } /* extern "C" { */

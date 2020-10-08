@@ -47,7 +47,7 @@ if ( ${CMAKE_C_COMPILER_ID}x MATCHES "MSVCx" )
                     ${${PROJECT_NAME}_SOURCE_DIR}/libunicode.c
                     ${${PROJECT_NAME}_SOURCE_DIR}/libregexp.c
                     ${${PROJECT_NAME}_SOURCE_DIR}/cutils.c
-                    ${${PROJECT_NAME}_SOURCE_DIR}/quickjs-wilton.c
+                    ${${PROJECT_NAME}_SOURCE_DIR}/quickjs-staticlib.c
             COMMAND $ENV{MINGW_HOME}/bin/gcc.exe
                     -shared
                     -o ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/quickjs.dll
@@ -56,7 +56,7 @@ if ( ${CMAKE_C_COMPILER_ID}x MATCHES "MSVCx" )
                     libunicode.o
                     libregexp.o
                     cutils.o
-                    quickjs-wilton.o
+                    quickjs-staticlib.o
             COMMAND $ENV{MINGW_HOME}/bin/objcopy.exe
                     --only-keep-debug
                     ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/quickjs.dll
@@ -78,7 +78,7 @@ if ( ${CMAKE_C_COMPILER_ID}x MATCHES "MSVCx" )
     endif ( )
 
     add_library ( ${PROJECT_NAME} STATIC
-                ${${PROJECT_NAME}_SOURCE_DIR}/wilton-dyload.c )
+                ${${PROJECT_NAME}_SOURCE_DIR}/staticlib-dyload.c )
     target_compile_definitions ( ${PROJECT_NAME} PRIVATE
             -Dinline=__inline )
 
@@ -90,7 +90,7 @@ else ()
             ${${PROJECT_NAME}_SOURCE_DIR}/libunicode.c
             ${${PROJECT_NAME}_SOURCE_DIR}/libregexp.c
             ${${PROJECT_NAME}_SOURCE_DIR}/cutils.c
-            ${${PROJECT_NAME}_SOURCE_DIR}/wilton-noop.c )
+            ${${PROJECT_NAME}_SOURCE_DIR}/staticlib-noop.c )
     target_include_directories ( ${PROJECT_NAME} BEFORE PRIVATE ${${PROJECT_NAME}_SOURCE_DIR} )
     target_compile_definitions ( ${PROJECT_NAME} PRIVATE
             -D_GNU_SOURCE

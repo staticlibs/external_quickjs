@@ -34,8 +34,7 @@
 #include "staticlib/support.hpp"
 
 void test_init() {
-    auto err = JS_WiltonInitialize();
-    std::cout << err << std::endl;
+    auto err = JS_StaticlibInitialize();
     slassert(0 == err);
 }
 
