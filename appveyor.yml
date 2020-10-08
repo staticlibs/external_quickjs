@@ -36,6 +36,7 @@ build: off
 build_script:
   - mkdir build-standalone
   - cd build-standalone
+  - set MINGW_HOME=C:\projects\mingw32
   - cmake ../external_quickjs
   - cmake --build .
   - cd ..
