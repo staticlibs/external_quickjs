@@ -14,7 +14,7 @@
 
 cmake_minimum_required ( VERSION 2.8.12 )
 
-project ( quickjs C CXX )
+project ( quickjs C )
 set ( ${PROJECT_NAME}_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/../../quickjs )
 
 if ( ${CMAKE_C_COMPILER_ID}x MATCHES "MSVCx" )
@@ -71,14 +71,14 @@ if ( ${CMAKE_C_COMPILER_ID}x MATCHES "MSVCx" )
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} )
 
     add_custom_target ( ${PROJECT_NAME}_mingw
-            DEPENDS ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/quickjs.dll )     
+            DEPENDS ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/quickjs.dll )
 
     if( ${CMAKE_SIZEOF_VOID_P} STREQUAL 4 )
         add_dependencies ( ${PROJECT_NAME}_mingw ${PROJECT_NAME}_libgcc )
     endif ( )
 
     add_library ( ${PROJECT_NAME} STATIC
-                ${${PROJECT_NAME}_SOURCE_DIR}/quickjs-msvc.cpp )
+                ${${PROJECT_NAME}_SOURCE_DIR}/wilton-dyload.c )
 
     add_dependencies ( ${PROJECT_NAME} ${PROJECT_NAME}_mingw )
 
@@ -87,7 +87,8 @@ else ()
             ${${PROJECT_NAME}_SOURCE_DIR}/quickjs.c
             ${${PROJECT_NAME}_SOURCE_DIR}/libunicode.c
             ${${PROJECT_NAME}_SOURCE_DIR}/libregexp.c
-            ${${PROJECT_NAME}_SOURCE_DIR}/cutils.c )
+            ${${PROJECT_NAME}_SOURCE_DIR}/cutils.c
+            ${${PROJECT_NAME}_SOURCE_DIR}/wilton-noop.c )
     target_include_directories ( ${PROJECT_NAME} BEFORE PRIVATE ${${PROJECT_NAME}_SOURCE_DIR} )
     target_compile_definitions ( ${PROJECT_NAME} PRIVATE
             -D_GNU_SOURCE

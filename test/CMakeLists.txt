@@ -24,11 +24,10 @@ set ( CMAKE_TOOLCHAIN_FILE ${STATICLIB_CMAKE}/toolchains/${STATICLIB_TOOLCHAIN}.
 # project
 project ( external_quickjs_test CXX C )
 include ( ${STATICLIB_CMAKE}/staticlibs_common.cmake )
-staticlib_enable_deplibs_cache ( )
 
 # dependencies
 if ( NOT DEFINED STATICLIB_DEPS )
-    set ( STATICLIB_DEPS ${CMAKE_CURRENT_LIST_DIR}/../../ CACHE INTERNAL "" )    
+    set ( STATICLIB_DEPS ${CMAKE_CURRENT_LIST_DIR}/../../ CACHE INTERNAL "" )
 endif ( )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_config )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_support )

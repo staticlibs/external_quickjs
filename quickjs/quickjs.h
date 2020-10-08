@@ -216,15 +216,15 @@ typedef struct JSValue {
 #define JS_VALUE_GET_FLOAT64(v) ((v).u.float64)
 #define JS_VALUE_GET_PTR(v) ((v).u.ptr)
 
-#ifdef __cplusplus
+#if defined(_MSC_VER) && defined(__cplusplus)
 inline JSValue JS_MKVAL(int32_t tag, int32_t val) {
     JSValueUnion u;
     u.int32 = val;
     return JSValue { u, tag };
 }
-#else
+#else // !(_MSC_VER && __cplusplus)
 #define JS_MKVAL(tag, val) (JSValue){ (JSValueUnion){ .int32 = val }, tag }
-#endif // __cplusplus
+#endif // _MSC_VER && __cplusplus
 #define JS_MKPTR(tag, p) (JSValue){ (JSValueUnion){ .ptr = p }, tag }
 
 #define JS_TAG_IS_FLOAT64(tag) ((unsigned)(tag) == JS_TAG_FLOAT64)
@@ -1015,14 +1015,12 @@ int JS_SetModuleExport(JSContext *ctx, JSModuleDef *m, const char *export_name,
 int JS_SetModuleExportList(JSContext *ctx, JSModuleDef *m,
                            const JSCFunctionListEntry *tab, int len);
 
-/* wilton symbols */
-int JS_WiltonInitialize();
-JSValue JS_WiltonUndefined();
-JSValue JS_WiltonNull();
-/* end wilton symbols */
-                           
 #undef js_unlikely
 #undef js_force_inline
+
+// wilton
+int JS_WiltonInitialize();
+// end wilton
 
 #ifdef __cplusplus
 } /* extern "C" { */

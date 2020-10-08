@@ -21,10 +21,6 @@
  * Created on July 1, 2020, 1:10 PM
  */
 
-#include <cstdlib>
-
-using namespace std;
-
 #include "quickjs.h"
 
 #include <cstring>
@@ -99,9 +95,9 @@ static JSValue my_native_func(JSContext *ctx, JSValueConst this_val,
     (void) this_val;
     (void) argc;
     auto input = JS_ToCStringLen(ctx, nullptr, argv[0]);
-    std::cout << "my_native_func called" << std::endl;
-    std::cout << argc << std::endl;
-    std::cout << std::string(input) << std::endl;
+    //std::cout << "my_native_func called" << std::endl;
+    //std::cout << argc << std::endl;
+    //std::cout << std::string(input) << std::endl;
     JS_FreeCString(ctx, input);
     auto res = JS_NewStringLen(ctx, "foo", 3);
     return res;
