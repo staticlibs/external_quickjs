@@ -42,6 +42,11 @@ JSValue wilton_JS_NewCFunction(JSContext *ctx, JSCFunction *func, const char *na
 }
 
 __declspec(dllexport)
+JSValue wilton_JS_NewCFunction2(JSContext *ctx, JSCFunction *func, const char *name, int length, JSCFunctionEnum cproto, int magic) {
+    return JS_NewCFunction2(ctx, func, name, length, cproto, magic);
+}
+
+__declspec(dllexport)
 JS_BOOL wilton_JS_IsFunction(JSContext* ctx, JSValueConst val) {
     return JS_IsFunction(ctx, val);
 }
@@ -57,8 +62,8 @@ JSValue wilton_JS_GetGlobalObject(JSContext *ctx) {
 }
 
 __declspec(dllexport)
-void wilton_JS_FreeValue(JSContext *ctx, JSValue v) {
-    JS_FreeValue(ctx, v);
+void wilton___JS_FreeValue(JSContext *ctx, JSValue v) {
+    __JS_FreeValue(ctx, v);
 }
 
 __declspec(dllexport)
@@ -72,8 +77,8 @@ int wilton_JS_SetPropertyStr(JSContext *ctx, JSValueConst this_obj, const char *
 }
 
 __declspec(dllexport)
-const char *wilton_JS_ToCStringLen(JSContext *ctx, size_t *plen, JSValueConst val1) {
-    return JS_ToCStringLen(ctx, plen, val1);
+const char *wilton_JS_ToCStringLen2(JSContext *ctx, size_t *plen, JSValueConst val1, JS_BOOL cesu8) {
+    return JS_ToCStringLen2(ctx, plen, val1, cesu8);
 }
 
 __declspec(dllexport)
@@ -89,21 +94,6 @@ JSValue wilton_JS_Throw(JSContext *ctx, JSValue obj) {
 __declspec(dllexport)
 JSValue wilton_JS_GetException(JSContext *ctx) {
     return JS_GetException(ctx);
-}
-
-__declspec(dllexport)
-JS_BOOL wilton_JS_IsObject(JSValueConst v) {
-    return JS_IsObject(v);
-}
-
-__declspec(dllexport)
-JS_BOOL wilton_JS_IsString(JSValueConst v) {
-    return JS_IsString(v);
-}
-
-__declspec(dllexport)
-JS_BOOL wilton_JS_IsException(JSValueConst v) {
-    return JS_IsException(v);
 }
 
 __declspec(dllexport)
@@ -124,14 +114,4 @@ JSValue wilton_JS_Call(JSContext *ctx, JSValueConst func_obj, JSValueConst this_
 __declspec(dllexport)
 void wilton_JS_RunGC(JSRuntime *rt) {
     JS_RunGC(rt);
-}
-
-__declspec(dllexport)
-JSValue wilton_JS_WiltonUndefined() {
-    return JS_WiltonUndefined();
-}
-
-__declspec(dllexport)
-JSValue wilton_JS_WiltonNull() {
-    return JS_WiltonNull(); 
 }

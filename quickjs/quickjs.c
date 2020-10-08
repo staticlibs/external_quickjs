@@ -52549,16 +52549,3 @@ void JS_AddIntrinsicTypedArrays(JSContext *ctx)
 #endif
 }
 
-/* wilton symbols */
-int JS_WiltonInitialize() {
-    return 0;
-}
-
-JSValue JS_WiltonUndefined() {
-    return JS_UNDEFINED;
-}
-
-JSValue JS_WiltonNull() {
-    return JS_NULL;
-}
-/* end wilton symbols */

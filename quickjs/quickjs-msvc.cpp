@@ -38,20 +38,17 @@ typedef void(*wilton_JS_FreeContext)(JSContext*);
 typedef void(*wilton_JS_SetMemoryLimit)(JSRuntime*, size_t);
 typedef void(*wilton_JS_SetGCThreshold)(JSRuntime*, size_t);
 typedef void(*wilton_JS_SetMaxStackSize)(JSRuntime*, size_t);
-typedef JSValue(*wilton_JS_NewCFunction)(JSContext*, JSCFunction*, const char*, int);
+typedef JSValue(*wilton_JS_NewCFunction2)(JSContext*, JSCFunction*, const char*, int, JSCFunctionEnum, int);
 typedef JS_BOOL(*wilton_JS_IsFunction)(JSContext*, JSValueConst);
 typedef JSValue(*wilton_JS_Eval)(JSContext*, const char*, size_t, const char*, int);
 typedef JSValue(*wilton_JS_GetGlobalObject)(JSContext*);
-typedef void(*wilton_JS_FreeValue)(JSContext*, JSValue);
+typedef void(*wilton___JS_FreeValue)(JSContext*, JSValue);
 typedef JSValue(*wilton_JS_GetPropertyStr)(JSContext*, JSValueConst, const char*);
 typedef int(*wilton_JS_SetPropertyStr)(JSContext*, JSValueConst, const char*, JSValue);
-typedef const char*(*wilton_JS_ToCStringLen)(JSContext*, size_t*, JSValueConst);
+typedef const char*(*wilton_JS_ToCStringLen2)(JSContext*, size_t*, JSValueConst, JS_BOOL);
 typedef void(*wilton_JS_FreeCString)(JSContext*, const char*);
 typedef JSValue(*wilton_JS_Throw)(JSContext*, JSValue);
 typedef JSValue(*wilton_JS_GetException)(JSContext*);
-typedef JS_BOOL(*wilton_JS_IsObject)(JSValueConst);
-typedef JS_BOOL(*wilton_JS_IsString)(JSValueConst);
-typedef JS_BOOL(*wilton_JS_IsException)(JSValueConst);
 typedef JSValue(*wilton_JS_NewStringLen)(JSContext*, const char*, size_t);
 typedef JSValue(*wilton_JS_NewError)(JSContext*);
 typedef JSValue(*wilton_JS_Call)(JSContext*, JSValueConst, JSValueConst, int, JSValueConst*);
@@ -113,10 +110,10 @@ void JS_SetMaxStackSize(JSRuntime *rt, size_t stack_size) {
     fun(rt, stack_size);
 }
 
-JSValue JS_NewCFunction(JSContext *ctx, JSCFunction *func, const char *name, int length) {
-    auto ptr = ::GetProcAddress(lib(), "wilton_JS_NewCFunction");
-    auto fun = reinterpret_cast<wilton_JS_NewCFunction>(ptr);
-    return fun(ctx, func, name, length);
+JSValue JS_NewCFunction2(JSContext *ctx, JSCFunction *func, const char *name, int length, JSCFunctionEnum cproto, int magic) {
+    auto ptr = ::GetProcAddress(lib(), "wilton_JS_NewCFunction2");
+    auto fun = reinterpret_cast<wilton_JS_NewCFunction2>(ptr);
+    return fun(ctx, func, name, length, cproto, magic);
 }
 
 JS_BOOL JS_IsFunction(JSContext* ctx, JSValueConst val) {
@@ -137,9 +134,9 @@ JSValue JS_GetGlobalObject(JSContext *ctx) {
     return fun(ctx);
 }
 
-void JS_FreeValue(JSContext *ctx, JSValue v) {
-    auto ptr = ::GetProcAddress(lib(), "wilton_JS_FreeValue");
-    auto fun = reinterpret_cast<wilton_JS_FreeValue>(ptr);
+void __JS_FreeValue(JSContext *ctx, JSValue v) {
+    auto ptr = ::GetProcAddress(lib(), "wilton___JS_FreeValue");
+    auto fun = reinterpret_cast<wilton___JS_FreeValue>(ptr);
     fun(ctx, v);
 }
 
@@ -155,10 +152,10 @@ int JS_SetPropertyStr(JSContext *ctx, JSValueConst this_obj, const char *prop, J
     return fun(ctx, this_obj, prop, val);
 }
 
-const char *JS_ToCStringLen(JSContext *ctx, size_t *plen, JSValueConst val1) {
-    auto ptr = ::GetProcAddress(lib(), "wilton_JS_ToCStringLen");
-    auto fun = reinterpret_cast<wilton_JS_ToCStringLen>(ptr);
-    return fun(ctx, plen, val1);
+const char *JS_ToCStringLen2(JSContext *ctx, size_t *plen, JSValueConst val1, JS_BOOL cesu8) {
+    auto ptr = ::GetProcAddress(lib(), "wilton_JS_ToCStringLen2");
+    auto fun = reinterpret_cast<wilton_JS_ToCStringLen2>(ptr);
+    return fun(ctx, plen, val1, cesu8);
 }
 
 void JS_FreeCString(JSContext *ctx, const char *ptr1) {
@@ -177,24 +174,6 @@ JSValue JS_GetException(JSContext *ctx) {
     auto ptr = ::GetProcAddress(lib(), "wilton_JS_GetException");
     auto fun = reinterpret_cast<wilton_JS_GetException>(ptr);
     return fun(ctx);
-}
-
-JS_BOOL JS_IsObject(JSValueConst v) {
-    auto ptr = ::GetProcAddress(lib(), "wilton_JS_IsObject");
-    auto fun = reinterpret_cast<wilton_JS_IsObject>(ptr);
-    return fun(v);
-}
-
-JS_BOOL JS_IsString(JSValueConst v) {
-    auto ptr = ::GetProcAddress(lib(), "wilton_JS_IsString");
-    auto fun = reinterpret_cast<wilton_JS_IsString>(ptr);
-    return fun(v);
-}
-
-JS_BOOL JS_IsException(JSValueConst v) {
-    auto ptr = ::GetProcAddress(lib(), "wilton_JS_IsException");
-    auto fun = reinterpret_cast<wilton_JS_IsException>(ptr);
-    return fun(v);
 }
 
 JSValue JS_NewStringLen(JSContext *ctx, const char *str1, size_t len1) {

@@ -13,32 +13,36 @@
 # limitations under the License.
 
 cmake_minimum_required ( VERSION 2.8.12 )
+
 project ( quickjs C CXX )
 set ( ${PROJECT_NAME}_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/../../quickjs )
 
-# check deplibs cache
-if ( STATICLIB_USE_DEPLIBS_CACHE )
-    set ( ${PROJECT_NAME}_CACHED_LIB_PATH ${STATICLIB_DEPLIBS_CACHE_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}${PROJECT_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX} )
-    if ( EXISTS ${${PROJECT_NAME}_CACHED_LIB_PATH} )
-        add_library( ${PROJECT_NAME} STATIC IMPORTED GLOBAL )
-        set_target_properties( ${PROJECT_NAME} PROPERTIES IMPORTED_LOCATION ${${PROJECT_NAME}_CACHED_LIB_PATH} )
-        message ( STATUS "Using cached library: [${${PROJECT_NAME}_CACHED_LIB_PATH}]" )
-        return ( )
-    endif ( )
-endif ( )
-
 if ( ${CMAKE_C_COMPILER_ID}x MATCHES "MSVCx" )
-    
-    add_library ( ${PROJECT_NAME} STATIC
-                ${CMAKE_CURRENT_LIST_DIR}/../../msvc/quickjs-shim.cpp )
 
-    add_custom_target ( ${PROJECT_NAME}_mingw
+    if ( CMAKE_BUILD_TYPE STREQUAL "Debug" )
+        set ( ${PROJECT_NAME}_MINGW_FLAG_OPT -O0 CACHE INTERNAL "" )
+        set ( ${PROJECT_NAME}_MINGW_FLAG_NDEBUG "" CACHE INTERNAL "" )
+    else ( ) # Release
+        set ( ${PROJECT_NAME}_MINGW_FLAG_OPT -Os CACHE INTERNAL "" )
+        set ( ${PROJECT_NAME}_MINGW_FLAG_NDEBUG -DNDEBUG CACHE INTERNAL "" )
+    endif ( )
+    
+    add_custom_command ( OUTPUT ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libgcc_s_sjlj-1.dll
+            COMMAND ${CMAKE_COMMAND} -E copy
+                    $ENV{MINGW_HOME}/bin/libgcc_s_sjlj-1.dll
+                    ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libgcc_s_sjlj-1.dll )
+                    
+    add_custom_target ( ${PROJECT_NAME}_libgcc
+            DEPENDS ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libgcc_s_sjlj-1.dll )
+    
+    add_custom_command ( OUTPUT ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/quickjs.dll
             COMMAND $ENV{MINGW_HOME}/bin/gcc.exe
                     -c
+                    -g
+                    ${${PROJECT_NAME}_MINGW_FLAG_OPT}
+                    ${${PROJECT_NAME}_MINGW_FLAG_NDEBUG}
                     -D_GNU_SOURCE
                     -DCONFIG_VERSION="\\"2020-04-12\\""
-                    -g
-                    -O0
                     ${${PROJECT_NAME}_SOURCE_DIR}/quickjs.c
                     ${${PROJECT_NAME}_SOURCE_DIR}/libunicode.c
                     ${${PROJECT_NAME}_SOURCE_DIR}/libregexp.c
@@ -53,7 +57,28 @@ if ( ${CMAKE_C_COMPILER_ID}x MATCHES "MSVCx" )
                     libregexp.o
                     cutils.o
                     quickjs-wilton.o
+            COMMAND $ENV{MINGW_HOME}/bin/objcopy.exe
+                    --only-keep-debug
+                    ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/quickjs.dll
+                    ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/quickjs.dll.debug
+            COMMAND $ENV{MINGW_HOME}/bin/objcopy.exe
+                    --strip-debug
+                    ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/quickjs.dll
+            COMMAND $ENV{MINGW_HOME}/bin/objcopy.exe
+                    --add-gnu-debuglink
+                    ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/quickjs.dll.debug
+                    ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/quickjs.dll
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} )
+
+    add_custom_target ( ${PROJECT_NAME}_mingw
+            DEPENDS ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/quickjs.dll )     
+
+    if( ${CMAKE_SIZEOF_VOID_P} STREQUAL 4 )
+        add_dependencies ( ${PROJECT_NAME}_mingw ${PROJECT_NAME}_libgcc )
+    endif ( )
+
+    add_library ( ${PROJECT_NAME} STATIC
+                ${${PROJECT_NAME}_SOURCE_DIR}/quickjs-msvc.cpp )
 
     add_dependencies ( ${PROJECT_NAME} ${PROJECT_NAME}_mingw )
 
@@ -68,16 +93,3 @@ else ()
             -D_GNU_SOURCE
             -DCONFIG_VERSION=\"2020-04-12\" )
 endif ()
-
-#if ( ${CMAKE_C_COMPILER_ID} MATCHES "GNU" OR ${CMAKE_C_COMPILER_ID} MATCHES "Clang" )
-#    target_compile_options ( ${PROJECT_NAME} PRIVATE
-#            -Wno-unused-parameter )
-#endif ( )
-#if ( ${CMAKE_C_COMPILER_ID} MATCHES "GNU" )
-#    target_compile_options ( ${PROJECT_NAME} PRIVATE
-#            -Wno-ignored-qualifiers )
-#endif ( )
-#if ( ${CMAKE_C_COMPILER_ID} MATCHES "Clang" )
-#    target_compile_options ( ${PROJECT_NAME} PRIVATE
-#            -Wno-deprecated )
-#endif ( )
