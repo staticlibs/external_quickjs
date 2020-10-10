@@ -26,7 +26,9 @@ install:
   - git clone https://github.com/staticlibs/tools_windows_pkgconfig.git
   - set PATH=%PATH%;c:\projects\tools_windows_pkgconfig\bin
   - git clone https://github.com/wilton-iot/mingw-i686-6.4.0-release-win32-sjlj-rt_v5-rev0.git mingw32
+  - set MINGW32_HOME=C:\projects\mingw32
   - git clone https://github.com/wilton-iot/mingw-x86_64-6.4.0-release-win32-sjlj-rt_v5-rev0.git mingw64
+  - set MINGW64_HOME=C:\projects\mingw64
   - git clone https://github.com/staticlibs/cmake.git
   - git clone https://github.com/staticlibs/staticlib_config.git
   - git clone https://github.com/staticlibs/staticlib_support.git
@@ -36,13 +38,11 @@ build: off
 build_script:
   - mkdir build-standalone
   - cd build-standalone
-  - set MINGW_HOME=C:\projects\mingw32
   - cmake ../external_quickjs
   - cmake --build .
   - cd ..
   - mkdir build_i386
   - cd build_i386
-  - set MINGW_HOME=C:\projects\mingw32
   - cmake ../external_quickjs/test
         -G "Visual Studio %SL_CMAKE_VS%"
         -DSTATICLIB_TOOLCHAIN=windows_i386_msvc
@@ -52,7 +52,6 @@ build_script:
   - cd ..
   - mkdir build_amd64
   - cd build_amd64
-  - set MINGW_HOME=C:\projects\mingw64
   - cmake ../external_quickjs/test
         -G "Visual Studio %SL_CMAKE_VS% Win64"
         -DSTATICLIB_TOOLCHAIN=windows_amd64_msvc

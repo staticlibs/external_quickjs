@@ -16,7 +16,7 @@ How to build
 
 [CMake](http://cmake.org/) is required for building.
 
-On Windows Mingw-w64 toolchain (with `MINGW_HOME` environment variable pointing to it)
+On Windows Mingw-w64 toolchain (with `MINGW32_HOME` or `MINGW64_HOME` environment variable pointing to it)
 is required to build QuickJS itself as a shared library. Static library wrapper for use from
 MSVC projects is built with MSVC and loads shared library dynamically.
 
@@ -41,6 +41,11 @@ This project is released under the [Apache License 2.0](http://www.apache.org/li
 
 Changelog
 ---------
+
+**2020-10-10**
+
+ * version 20200412-2
+ * minor build changes
 
 **2020-10-08**
 

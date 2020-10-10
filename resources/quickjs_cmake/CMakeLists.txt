@@ -26,17 +26,22 @@ if ( ${CMAKE_C_COMPILER_ID}x MATCHES "MSVCx" )
         set ( ${PROJECT_NAME}_MINGW_FLAG_OPT -Os CACHE INTERNAL "" )
         set ( ${PROJECT_NAME}_MINGW_FLAG_NDEBUG -DNDEBUG CACHE INTERNAL "" )
     endif ( )
+    if ( ${CMAKE_SIZEOF_VOID_P} STREQUAL 4 )
+        set ( ${PROJECT_NAME}_MINGW_HOME $ENV{MINGW32_HOME} CACHE INTERNAL "" )
+    else ( )
+        set ( ${PROJECT_NAME}_MINGW_HOME $ENV{MINGW64_HOME} CACHE INTERNAL "" )
+    endif ( )
     
     add_custom_command ( OUTPUT ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libgcc_s_sjlj-1.dll
             COMMAND ${CMAKE_COMMAND} -E copy
-                    $ENV{MINGW_HOME}/bin/libgcc_s_sjlj-1.dll
+                    ${${PROJECT_NAME}_MINGW_HOME}/bin/libgcc_s_sjlj-1.dll
                     ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libgcc_s_sjlj-1.dll )
                     
     add_custom_target ( ${PROJECT_NAME}_libgcc
             DEPENDS ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libgcc_s_sjlj-1.dll )
     
     add_custom_command ( OUTPUT ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/quickjs.dll
-            COMMAND $ENV{MINGW_HOME}/bin/gcc.exe
+            COMMAND ${${PROJECT_NAME}_MINGW_HOME}/bin/gcc.exe
                     -c
                     -g
                     ${${PROJECT_NAME}_MINGW_FLAG_OPT}
@@ -48,7 +53,7 @@ if ( ${CMAKE_C_COMPILER_ID}x MATCHES "MSVCx" )
                     ${${PROJECT_NAME}_SOURCE_DIR}/libregexp.c
                     ${${PROJECT_NAME}_SOURCE_DIR}/cutils.c
                     ${${PROJECT_NAME}_SOURCE_DIR}/quickjs-staticlib.c
-            COMMAND $ENV{MINGW_HOME}/bin/gcc.exe
+            COMMAND ${${PROJECT_NAME}_MINGW_HOME}/bin/gcc.exe
                     -shared
                     -o ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/quickjs.dll
                     -Wl,--exclude-all-symbols
@@ -57,14 +62,14 @@ if ( ${CMAKE_C_COMPILER_ID}x MATCHES "MSVCx" )
                     libregexp.o
                     cutils.o
                     quickjs-staticlib.o
-            COMMAND $ENV{MINGW_HOME}/bin/objcopy.exe
+            COMMAND ${${PROJECT_NAME}_MINGW_HOME}/bin/objcopy.exe
                     --only-keep-debug
                     ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/quickjs.dll
                     ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/quickjs.dll.debug
-            COMMAND $ENV{MINGW_HOME}/bin/objcopy.exe
+            COMMAND ${${PROJECT_NAME}_MINGW_HOME}/bin/objcopy.exe
                     --strip-debug
                     ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/quickjs.dll
-            COMMAND $ENV{MINGW_HOME}/bin/objcopy.exe
+            COMMAND ${${PROJECT_NAME}_MINGW_HOME}/bin/objcopy.exe
                     --add-gnu-debuglink
                     ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/quickjs.dll.debug
                     ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/quickjs.dll
@@ -73,7 +78,7 @@ if ( ${CMAKE_C_COMPILER_ID}x MATCHES "MSVCx" )
     add_custom_target ( ${PROJECT_NAME}_mingw
             DEPENDS ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/quickjs.dll )
 
-    if( ${CMAKE_SIZEOF_VOID_P} STREQUAL 4 )
+    if ( ${CMAKE_SIZEOF_VOID_P} STREQUAL 4 )
         add_dependencies ( ${PROJECT_NAME}_mingw ${PROJECT_NAME}_libgcc )
     endif ( )
 
