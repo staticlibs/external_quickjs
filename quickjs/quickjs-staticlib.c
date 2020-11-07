@@ -142,3 +142,28 @@ __declspec(dllexport)
 void staticlib_JS_SetModuleLoaderFunc(JSRuntime *rt, JSModuleNormalizeFunc *module_normalize, JSModuleLoaderFunc *module_loader, void *opaque) {
     JS_SetModuleLoaderFunc(rt, module_normalize, module_loader, opaque);
 }
+
+__declspec(dllexport)
+JSValue staticlib_JS_NewArray(JSContext *ctx) {
+    return JS_NewArray(ctx);
+}
+
+__declspec(dllexport)
+JSValue staticlib_JS_EvalFunction(JSContext *ctx, JSValue fun_obj) {
+    return JS_EvalFunction(ctx, fun_obj);
+}
+
+__declspec(dllexport)
+int staticlib_JS_DefinePropertyValueUint32(JSContext *ctx, JSValueConst this_obj, uint32_t idx, JSValue val, int flags) {
+    return JS_DefinePropertyValueUint32(ctx, this_obj, idx, val, flags);
+}
+
+__declspec(dllexport)
+int staticlib_JS_DefinePropertyValueStr(JSContext *ctx, JSValueConst this_obj, const char *prop, JSValue val, int flags) {
+    return JS_DefinePropertyValueStr(ctx, this_obj, prop, val, flags);
+}
+
+__declspec(dllexport)
+JSValue staticlib_JS_GetImportMeta(JSContext *ctx, JSModuleDef *m) {
+    return JS_GetImportMeta(ctx, m);
+}

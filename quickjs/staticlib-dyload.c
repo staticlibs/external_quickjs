@@ -64,6 +64,11 @@ typedef JSValue(*staticlib_JS_NewError)(JSContext*);
 typedef JSValue(*staticlib_JS_Call)(JSContext*, JSValueConst, JSValueConst, int, JSValueConst*);
 typedef void(*staticlib_JS_RunGC)(JSRuntime*);
 typedef void(*staticlib_JS_SetModuleLoaderFunc)(JSRuntime*, JSModuleNormalizeFunc*, JSModuleLoaderFunc*, void*);
+typedef JSValue(*staticlib_JS_NewArray)(JSContext*);
+typedef JSValue(*staticlib_JS_EvalFunction)(JSContext*, JSValue);
+typedef int(*staticlib_JS_DefinePropertyValueUint32)(JSContext*, JSValueConst, uint32_t, JSValue, int);
+typedef int(*staticlib_JS_DefinePropertyValueStr)(JSContext*, JSValueConst, const char*, JSValue, int);
+typedef JSValue(*staticlib_JS_GetImportMeta)(JSContext*, JSModuleDef*);
 
 static HMODULE lib = NULL;
 
@@ -216,4 +221,34 @@ void JS_SetModuleLoaderFunc(JSRuntime *rt, JSModuleNormalizeFunc *module_normali
     FARPROC ptr = GetProcAddress(lib, "staticlib_JS_SetModuleLoaderFunc");
     staticlib_JS_SetModuleLoaderFunc fun = (staticlib_JS_SetModuleLoaderFunc)(ptr);
     fun(rt, module_normalize, module_loader, opaque);
+}
+
+JSValue JS_NewArray(JSContext *ctx) {
+    FARPROC ptr = GetProcAddress(lib, "staticlib_JS_NewArray");
+    staticlib_JS_NewArray fun = (staticlib_JS_NewArray)(ptr);
+    return fun(ctx);
+}
+
+JSValue JS_EvalFunction(JSContext *ctx, JSValue fun_obj) {
+    FARPROC ptr = GetProcAddress(lib, "staticlib_JS_EvalFunction");
+    staticlib_JS_EvalFunction fun = (staticlib_JS_EvalFunction)(ptr);
+    return fun(ctx, fun_obj);
+}
+
+int JS_DefinePropertyValueUint32(JSContext *ctx, JSValueConst this_obj, uint32_t idx, JSValue val, int flags) {
+    FARPROC ptr = GetProcAddress(lib, "staticlib_JS_DefinePropertyValueUint32");
+    staticlib_JS_DefinePropertyValueUint32 fun = (staticlib_JS_DefinePropertyValueUint32)(ptr);
+    return fun(ctx, this_obj, idx, val, flags);
+}
+
+int JS_DefinePropertyValueStr(JSContext *ctx, JSValueConst this_obj, const char *prop, JSValue val, int flags) {
+    FARPROC ptr = GetProcAddress(lib, "staticlib_JS_DefinePropertyValueStr");
+    staticlib_JS_DefinePropertyValueStr fun = (staticlib_JS_DefinePropertyValueStr)(ptr);
+    return fun(ctx, this_obj, prop, val, flags);
+}
+
+JSValue JS_GetImportMeta(JSContext *ctx, JSModuleDef *m) {
+    FARPROC ptr = GetProcAddress(lib, "staticlib_JS_GetImportMeta");
+    staticlib_JS_GetImportMeta fun = (staticlib_JS_GetImportMeta)(ptr);
+    return fun(ctx, m);
 }
