@@ -42,6 +42,11 @@ This project is released under the [Apache License 2.0](http://www.apache.org/li
 Changelog
 ---------
 
+**2020-11-07**
+
+ * version 20200412-3
+ * ES modules support on Windows
+
 **2020-10-10**
 
  * version 20200412-2

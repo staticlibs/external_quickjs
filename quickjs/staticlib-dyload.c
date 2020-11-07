@@ -63,6 +63,7 @@ typedef JSValue(*staticlib_JS_NewStringLen)(JSContext*, const char*, size_t);
 typedef JSValue(*staticlib_JS_NewError)(JSContext*);
 typedef JSValue(*staticlib_JS_Call)(JSContext*, JSValueConst, JSValueConst, int, JSValueConst*);
 typedef void(*staticlib_JS_RunGC)(JSRuntime*);
+typedef void(*staticlib_JS_SetModuleLoaderFunc)(JSRuntime*, JSModuleNormalizeFunc*, JSModuleLoaderFunc*, void*);
 
 static HMODULE lib = NULL;
 
@@ -209,4 +210,10 @@ void JS_RunGC(JSRuntime *rt) {
     FARPROC ptr = GetProcAddress(lib, "staticlib_JS_RunGC");
     staticlib_JS_RunGC fun = (staticlib_JS_RunGC)(ptr);
     fun(rt);
+}
+
+void JS_SetModuleLoaderFunc(JSRuntime *rt, JSModuleNormalizeFunc *module_normalize, JSModuleLoaderFunc *module_loader, void *opaque) {
+    FARPROC ptr = GetProcAddress(lib, "staticlib_JS_SetModuleLoaderFunc");
+    staticlib_JS_SetModuleLoaderFunc fun = (staticlib_JS_SetModuleLoaderFunc)(ptr);
+    fun(rt, module_normalize, module_loader, opaque);
 }

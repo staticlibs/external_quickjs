@@ -137,3 +137,8 @@ __declspec(dllexport)
 void staticlib_JS_RunGC(JSRuntime *rt) {
     JS_RunGC(rt);
 }
+
+__declspec(dllexport)
+void staticlib_JS_SetModuleLoaderFunc(JSRuntime *rt, JSModuleNormalizeFunc *module_normalize, JSModuleLoaderFunc *module_loader, void *opaque) {
+    JS_SetModuleLoaderFunc(rt, module_normalize, module_loader, opaque);
+}
